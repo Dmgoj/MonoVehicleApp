@@ -4,9 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Project.DAL.Entities
 {
+    [Index(nameof(RegistrationNumber),IsUnique = true)]
     public class VehicleRegistration
     {
         public int Id { get; set; }
@@ -21,6 +24,5 @@ namespace Project.DAL.Entities
         public VehicleModel VehicleModel { get; set; }
         public VehicleEngineType VehicleEngineType { get; set; }
         public VehicleOwner VehicleOwner { get; set; }
-       
     }
 }
