@@ -20,13 +20,5 @@ namespace Project.DAL
         public DbSet<VehicleModel> VehicleModels { get; set; }
         public DbSet<VehicleOwner> VehicleOwners { get; set; }
         public DbSet<VehicleRegistration> VehicleRegistrations { get; set; }
-        
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            // Configure your entity mappings here
-        }
-    }
-    {
     }
 }
