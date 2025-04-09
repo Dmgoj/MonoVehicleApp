@@ -9,14 +9,14 @@ namespace Project.DAL.Entities
 {
     public class VehicleModel
     {
-        int Id { get; set; }
+        public int Id { get; set; }
         [Required, MaxLength(50)]
-        string Name { get; set; }
+        public string Name { get; set; }
         [MaxLength(5)]
-        string Abrv { get; set; }
+        public string Abrv { get; set; }
         [Required]
-        int VehicleMakeId { get; set; }
-        VehicleMake VehicleMake { get; set; }
-        ICollection<VehicleRegistration> VehicleRegistrations { get; set; } = new List<VehicleRegistration>();
+        public int VehicleMakeId { get; set; }
+        public VehicleMake VehicleMake { get; set; }
+        public ICollection<VehicleRegistration> VehicleRegistrations { get; set; } = new List<VehicleRegistration>();
     }
 }

@@ -9,11 +9,11 @@ namespace Project.DAL.Entities
 {
     public class VehicleMake
     {
-        int Id { get; set; }
+        public int Id { get; set; }
         [Required, MaxLength(50)]
-        string Name { get; set; }
+        public string Name { get; set; }
         [MaxLength(5)]
-        string Abrv { get; set; }
-        ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
+        public string Abrv { get; set; }
+        public ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
     }
 }
