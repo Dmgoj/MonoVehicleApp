@@ -28,6 +28,7 @@ namespace Project.Repository
             VehicleMake = vehicleMakeRepository;
             VehicleModel = vehicleModelRepository;
             VehicleOwner = vehicleOwnerRepository;
+            VehicleEngineType = vehicleEngineTypeRepository;
             VehicleRegistration = vehicleRegistrationRepository;
         }
         public void Save()
