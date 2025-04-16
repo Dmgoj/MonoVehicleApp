@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Project.Common;
 using Project.Repository.Common;
 
 namespace Project.Repository
@@ -25,7 +26,8 @@ namespace Project.Repository
         public async Task<IEnumerable<TEntity>> Get(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "")
+            string includeProperties = "",
+            PagingParameters pagingParameters = null)
         {
             IQueryable<TEntity> query = _dbSet;
 
@@ -43,10 +45,14 @@ namespace Project.Repository
             {
                 return await orderBy(query).ToListAsync();
             }
-            else
+
+            if (pagingParameters != null)
             {
-                return await query.ToListAsync();
+                query = query.Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSize)
+                             .Take(pagingParameters.PageSize);
             }
+            
+            return await query.ToListAsync();
         }
 
         public async Task<TEntity> GetByID(object id)
