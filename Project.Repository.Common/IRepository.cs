@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Project.Common;
 
 namespace Project.Repository.Common
 {
@@ -10,7 +11,8 @@ namespace Project.Repository.Common
         Task<IEnumerable<TEntity>> Get(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "");
+            string includeProperties = "",
+            PagingParameters pagingParameters = null);
 
         Task<TEntity> GetByID(object id);
 
