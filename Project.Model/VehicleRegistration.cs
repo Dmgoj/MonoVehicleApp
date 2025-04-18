@@ -12,6 +12,4 @@ namespace Project.Model
         public int Id { get; set; }
         public string RegistrationNumber { get; set; }
     }
-    {
-    }
 }
