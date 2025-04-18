@@ -31,9 +31,10 @@ namespace Project.Repository
             VehicleEngineType = vehicleEngineTypeRepository;
             VehicleRegistration = vehicleRegistrationRepository;
         }
-        public void Save()
+        public async Task<int> Save()
         {
-            _context.SaveChanges();
+            return await _context.SaveChangesAsync();
+            
         }
 
         private bool disposed = false;

@@ -8,6 +8,6 @@ namespace Project.Repository.Common
 {
     public interface IUnitOfWork : IDisposable
     {
-        void Save();
+        Task<int> Save();
     }
 }
