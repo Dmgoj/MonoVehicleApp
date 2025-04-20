@@ -29,6 +29,7 @@ namespace Project.Repository
             string includeProperties = "",
             PagingParameters pagingParameters = null)
         {
+            pagingParameters ??= new PagingParameters();
             IQueryable<TEntity> query = _dbSet;
 
             if (filter != null)
@@ -75,7 +76,7 @@ namespace Project.Repository
             {
                 throw new InvalidOperationException("This repository is read-only.");
             }
-            var entityToDelete = _dbSet.FindAsync(id);
+            var entityToDelete = await _dbSet.FindAsync(id);
             await Delete(entityToDelete);
         }
 
