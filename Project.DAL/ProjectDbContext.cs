@@ -14,7 +14,7 @@ namespace Project.DAL
             : base(options)
         {
         }
-        // Define DbSets for your entities here
+       
         public DbSet<VehicleEngineType> VehicleEngineTypes { get; set; }
         public DbSet<VehicleMake> VehicleMakes { get; set; }
         public DbSet<VehicleModel> VehicleModels { get; set; }
