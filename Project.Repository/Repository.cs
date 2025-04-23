@@ -86,10 +86,6 @@ namespace Project.Repository
             {
                 throw new InvalidOperationException("This repository is read-only.");
             }
-            if (_context.Entry(entityToDelete).State == EntityState.Detached)
-            {
-                _dbSet.Attach(entityToDelete);
-            }
             _dbSet.Remove(entityToDelete);
             return Task.CompletedTask;
         }
@@ -100,8 +96,7 @@ namespace Project.Repository
             {
                 throw new InvalidOperationException("This repository is read-only.");
             }
-            _dbSet.Attach(entityToUpdate);
-             _context.Entry(entityToUpdate).State = EntityState.Modified;
+            _dbSet.Update(entityToUpdate);
             return Task.CompletedTask;
         }
     }
