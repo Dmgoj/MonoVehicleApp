@@ -11,7 +11,7 @@ namespace Project.Repository
 {
     public class VehicleEngineTypeRepository : Repository<VehicleEngineType>, IVehicleEngineTypeRepository
     {
-        public VehicleEngineTypeRepository(ProjectDbContext context) : base(context)
+        public VehicleEngineTypeRepository(ProjectDbContext context, bool isReadonly=true) : base(context, isReadonly)
         {
         }
        
