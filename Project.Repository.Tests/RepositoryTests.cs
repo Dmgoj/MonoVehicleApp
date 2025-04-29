@@ -18,11 +18,9 @@ namespace Project.Repository.Tests
 {
     public class RepositoryTests
     {
-       // private readonly Mock<DbSet<VehicleMake>> _mockDbSet;
         private readonly Mock<DbContext> _mockDbContext;
         private readonly List<VehicleMake> _vehicleMakes;
-        //private readonly Mock<IRepository<VehicleMake>> _mockRepository;
-        private readonly Repository<VehicleMake> _repository;
+        private readonly IRepository<VehicleMake> _repository;
 
         public RepositoryTests()
         {
