@@ -6,17 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Project.Common;
+using Project.DAL;
 using Project.Repository.Common;
 
 namespace Project.Repository
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        private readonly DbContext _context;
+        private readonly ProjectDbContext _context;
         private readonly DbSet<TEntity> _dbSet;
         private readonly bool _isReadOnly; // Used for VehicleEngineType read only requirement
 
-        public Repository(DbContext context, bool isReadOnly = false)
+        public Repository(ProjectDbContext context, bool isReadOnly = false)
         {
             _context = context;
             _dbSet = context.Set<TEntity>();
@@ -32,6 +33,13 @@ namespace Project.Repository
             pagingParameters ??= new PagingParameters();
             IQueryable<TEntity> query = _dbSet;
 
+
+            if (pagingParameters != null)
+            {
+                query = query.Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSize)
+                             .Take(pagingParameters.PageSize);
+            }
+
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -44,15 +52,17 @@ namespace Project.Repository
 
             if (orderBy != null)
             {
-                return await orderBy(query).ToListAsync();
+                query = orderBy(query);
             }
+
 
             if (pagingParameters != null)
             {
                 query = query.Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSize)
                              .Take(pagingParameters.PageSize);
             }
-            
+
+
             return await query.ToListAsync();
         }
 

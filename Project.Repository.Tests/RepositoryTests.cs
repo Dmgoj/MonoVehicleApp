@@ -18,7 +18,7 @@ namespace Project.Repository.Tests
 {
     public class RepositoryTests
     {
-        private readonly Mock<DbContext> _mockDbContext;
+        private readonly Mock<ProjectDbContext> _mockDbContext;
         private readonly List<VehicleMake> _vehicleMakes;
         private readonly IRepository<VehicleMake> _repository;
 
@@ -33,7 +33,7 @@ namespace Project.Repository.Tests
             new VehicleMake { Id = 5, Name = "Audi", Abrv = "AUD" }
             };
 
-            _mockDbContext = new Mock<DbContext>();
+            _mockDbContext = new Mock<ProjectDbContext>();
             _mockDbContext
                 .Setup(ctx => ctx.Set<VehicleMake>())
                 .ReturnsDbSet(_vehicleMakes);
