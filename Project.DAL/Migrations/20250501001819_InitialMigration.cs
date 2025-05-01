@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Project.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,9 +82,6 @@ namespace Project.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RegistrationNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    ModelId = table.Column<int>(type: "int", nullable: false),
-                    EngineTypeId = table.Column<int>(type: "int", nullable: false),
-                    OwnerId = table.Column<int>(type: "int", nullable: false),
                     VehicleModelId = table.Column<int>(type: "int", nullable: false),
                     VehicleEngineTypeId = table.Column<int>(type: "int", nullable: false),
                     VehicleOwnerId = table.Column<int>(type: "int", nullable: false)

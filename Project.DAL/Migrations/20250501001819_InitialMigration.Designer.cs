@@ -12,8 +12,8 @@ using Project.DAL;
 namespace Project.DAL.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20250408130955_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250501001819_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,15 +132,6 @@ namespace Project.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EngineTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
 
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()

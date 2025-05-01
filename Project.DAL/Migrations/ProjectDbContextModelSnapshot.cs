@@ -130,15 +130,6 @@ namespace Project.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EngineTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ModelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasMaxLength(10)
