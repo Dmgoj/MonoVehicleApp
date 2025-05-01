@@ -10,6 +10,7 @@ using Project.DAL.Entities;
 using Project.Repository.Common;
 using Project.Service;
 using Project.Service.Common;
+using Project.Service.Common.Exceptions;
 using Project.Service.Common.Parameters;
 using Xunit;
 
@@ -100,7 +101,7 @@ namespace Project.Service.Tests
         }
 
         [Fact]
-        public async Task GetByIdAsync_EntityMissing_Throws_KeyNotFoundException()
+        public async Task GetByIdAsync_EntityMissing_Throws_NotFoundException()
         {
             // Arrange
             _repoMock.Setup(r => r.GetByID(42)).ReturnsAsync((VehicleModel)null);
@@ -109,7 +110,7 @@ namespace Project.Service.Tests
             Func<Task> act = () => _service.GetByIdAsync(42);
 
             // Assert
-            await act.Should().ThrowAsync<KeyNotFoundException>()
+            await act.Should().ThrowAsync<NotFoundException>()
                      .WithMessage("VehicleModel with ID 42 not found.");
         }
 
@@ -157,7 +158,7 @@ namespace Project.Service.Tests
         }
 
         [Fact]
-        public async Task UpdateAsync_EntityMissing_Throws_KeyNotFoundException()
+        public async Task UpdateAsync_EntityMissing_Throws_NotFoundException()
         {
             // Arrange
             _repoMock.Setup(r => r.GetByID(13)).ReturnsAsync((VehicleModel)null);
@@ -167,7 +168,7 @@ namespace Project.Service.Tests
             Func<Task> act = () => _service.UpdateAsync(13, updateDto);
 
             // Assert
-            await act.Should().ThrowAsync<KeyNotFoundException>()
+            await act.Should().ThrowAsync<NotFoundException>()
                      .WithMessage("VehicleModel with ID 13 not found.");
         }
 
