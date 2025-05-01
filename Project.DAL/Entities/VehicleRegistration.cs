@@ -16,11 +16,11 @@ namespace Project.DAL.Entities
         [Required, MaxLength(10)]
         public string RegistrationNumber { get; set; }
         [Required]
-        public int ModelId { get; set; }
+        public int VehicleModelId { get; set; }
         [Required]
-        public int EngineTypeId { get; set; }
+        public int VehicleEngineTypeId { get; set; }
         [Required]
-        public int OwnerId { get; set; }
+        public int VehicleOwnerId { get; set; }
         public VehicleModel VehicleModel { get; set; }
         public VehicleEngineType VehicleEngineType { get; set; }
         public VehicleOwner VehicleOwner { get; set; }
