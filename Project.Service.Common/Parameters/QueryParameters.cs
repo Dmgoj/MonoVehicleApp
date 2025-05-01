@@ -42,8 +42,8 @@ namespace Project.Service.Common.Parameters
     #endregion
     public class QueryParameters : PagingParameters
     {
-        public string Filter { get; set; }
-        public string SortBy { get; set; }
+        public string? Filter { get; set; }
+        public string? SortBy { get; set; }
         public bool SortDescending { get; set; }
     }
 }
