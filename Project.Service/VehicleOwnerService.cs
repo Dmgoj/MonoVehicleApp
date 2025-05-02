@@ -33,16 +33,26 @@ namespace Project.Service
         {
             try
             {
-                Expression<Func<VehicleOwner, bool>> filter = null;
-                if (!string.IsNullOrWhiteSpace(parameters.Filter))
-                {
-                    var term = parameters.Filter.Trim().ToLower();
-                    filter = o => o.FirstName.ToLower().Contains(term)
-                               || o.LastName.ToLower().Contains(term);
-                }
+                string term = string.IsNullOrWhiteSpace(parameters.Filter)
+                    ? null
+                    : parameters.Filter.Trim().ToLower();
 
-                var allOwners = await _repository.Get(filter: filter);
-                var totalCount = allOwners.Count();
+                Expression<Func<VehicleOwner, bool>> filter = o =>
+                    (term == null
+                     || o.FirstName.ToLower().Contains(term)
+                     || o.LastName.ToLower().Contains(term))
+                    && (!parameters.MakeId.HasValue
+                        || o.VehicleRegistrations
+                            .Any(r => r.VehicleModel.VehicleMakeId == parameters.MakeId.Value))
+                    && (!parameters.ModelId.HasValue
+                        || o.VehicleRegistrations
+                            .Any(r => r.VehicleModelId == parameters.ModelId.Value));
+
+                var all = await _repository.Get(
+                    filter: filter,
+                    includeProperties: "VehicleRegistrations.VehicleModel,VehicleRegistrations.VehicleModel.VehicleMake"
+                );
+                var totalCount = all.Count();
 
                 Func<IQueryable<VehicleOwner>, IOrderedQueryable<VehicleOwner>> orderBy = null;
                 if (!string.IsNullOrWhiteSpace(parameters.SortBy)
@@ -67,7 +77,7 @@ namespace Project.Service
                 var page = await _repository.Get(
                     filter: filter,
                     orderBy: orderBy,
-                    includeProperties: string.Empty,
+                    includeProperties: "VehicleRegistrations.VehicleModel,VehicleRegistrations.VehicleModel.VehicleMake",
                     pagingParameters: parameters
                 );
 
@@ -86,6 +96,11 @@ namespace Project.Service
                 throw new ServiceException("An error occurred while retrieving vehicle owners.", ex);
             }
         }
+
+
+
+
+
 
         public async Task<VehicleOwnerDto> GetByIdAsync(int id)
         {
