@@ -18,7 +18,6 @@ class VehicleMakeStore {
   async fetchMakes() {
     this.loading = true;
     try {
-      // ← Make sure you have both pageNumber AND pageSize here:
       const params = {
         pageNumber: this.pageNumber,
         pageSize:   this.pageSize
