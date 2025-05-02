@@ -33,13 +33,15 @@ namespace Project.Service
         {
             try
             {
-                Expression<Func<VehicleModel, bool>> filter = null;
-                if (!string.IsNullOrWhiteSpace(parameters.Filter))
-                {
-                    var term = parameters.Filter.Trim().ToLower();
-                    filter = m => m.Name.ToLower().Contains(term);
-                }
+                string term = string.IsNullOrWhiteSpace(parameters.Filter)
+                    ? null
+                    : parameters.Filter.Trim().ToLower();
 
+                Expression<Func<VehicleModel, bool>> filter = m =>
+                    (term == null || m.Name.ToLower().Contains(term))
+                    && (!parameters.MakeId.HasValue || m.VehicleMakeId == parameters.MakeId.Value);
+
+                
                 var all = await _repository.Get(filter: filter);
                 var totalCount = all.Count();
 
@@ -55,7 +57,6 @@ namespace Project.Service
                                 ? q.OrderByDescending(x => x.Name)
                                 : q.OrderBy(x => x.Name);
                             break;
-
                         case VehicleModelSortField.Abrv:
                             orderBy = q => desc
                                 ? q.OrderByDescending(x => x.Abrv)
@@ -86,6 +87,7 @@ namespace Project.Service
                 throw new ServiceException("An error occurred while retrieving vehicle models.", ex);
             }
         }
+
 
         public async Task<VehicleModelDto> GetByIdAsync(int id)
         {
