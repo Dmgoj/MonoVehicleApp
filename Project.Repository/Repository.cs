@@ -30,15 +30,8 @@ namespace Project.Repository
             string includeProperties = "",
             PagingParameters pagingParameters = null)
         {
-            pagingParameters ??= new PagingParameters();
             IQueryable<TEntity> query = _dbSet;
 
-
-            if (pagingParameters != null)
-            {
-                query = query.Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSize)
-                             .Take(pagingParameters.PageSize);
-            }
 
             if (filter != null)
             {
