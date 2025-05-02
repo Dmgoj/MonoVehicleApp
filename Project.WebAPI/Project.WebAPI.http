@@ -1,6 +1,159 @@
-@Project.WebAPI_HostAddress = http://localhost:5133
+@Project.WebAPI_HostAddress = https://localhost:7004/api
 
-GET {{Project.WebAPI_HostAddress}}/weatherforecast/
+###GET all
+GET {{Project.WebAPI_HostAddress}}/VehicleMakes
 Accept: application/json
 
-###
+### GET by ID
+GET {{Project.WebAPI_HostAddress}}/VehicleMakes/5
+Accept: application/json
+
+### POST (create new)
+POST {{Project.WebAPI_HostAddress}}/VehicleMakes
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Ferrari",
+  "abrv": "FRRI"
+}
+
+### PUT (update existing)
+PUT {{Project.WebAPI_HostAddress}}/VehicleMakes/5
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Fera Updated",
+  "abrv": "FER"
+}
+
+### DELETE (remove)
+DELETE {{Project.WebAPI_HostAddress}}/VehicleMakes/5
+Accept: application/json
+
+### GET all VehicleModels (optional filter/sort/page)
+GET {{Project.WebAPI_HostAddress}}/VehicleModels?sortBy=name&pageSize=2
+Accept: application/json
+
+### GET all VehicleModels (no params)
+GET {{Project.WebAPI_HostAddress}}/VehicleModels
+Accept: application/json
+
+### GET a single VehicleModel by ID
+GET {{Project.WebAPI_HostAddress}}/VehicleModels/10
+Accept: application/json
+
+### POST create a new VehicleModel
+POST {{Project.WebAPI_HostAddress}}/VehicleModels
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Camry",
+  "abrv": "CMR",
+  "vehicleMakeId": 1
+}
+
+### PUT update an existing VehicleModel
+PUT {{Project.WebAPI_HostAddress}}/VehicleModels/3
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Camry SE",
+  "abrv": "CMRSE",
+  "vehicleMakeId": 1
+}
+
+### DELETE a VehicleModel
+DELETE {{Project.WebAPI_HostAddress}}/VehicleModels/10
+Accept: application/json
+
+
+### GET all VehicleOwners (optional filter/sort/page)
+GET {{Project.WebAPI_HostAddress}}/VehicleOwners?sortBy=lastName&
+Accept: application/json
+
+### GET all VehicleOwners (no params)
+GET {{Project.WebAPI_HostAddress}}/VehicleOwners
+Accept: application/json
+
+### GET a single VehicleOwner by ID
+GET {{Project.WebAPI_HostAddress}}/VehicleOwners/1
+Accept: application/json
+
+### POST create a new VehicleOwner
+POST {{Project.WebAPI_HostAddress}}/VehicleOwners
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "dob": "1985-07-12"
+}
+
+### PUT update an existing VehicleOwner
+PUT {{Project.WebAPI_HostAddress}}/VehicleOwners/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "dob": "1985-07-12"
+}
+
+### DELETE a VehicleOwner
+DELETE {{Project.WebAPI_HostAddress}}/VehicleOwners/2
+Accept: application/json
+
+
+### GET all VehicleRegistrations (optional filter/sort/page)
+GET {{Project.WebAPI_HostAddress}}/VehicleRegistrations?filter=abc&sortBy=registrationNumber&sortDescending=false&pageNumber=1&pageSize=2
+Accept: application/json
+
+### GET all VehicleRegistrations (no params)
+GET {{Project.WebAPI_HostAddress}}/VehicleRegistrations
+Accept: application/json
+
+### GET a single VehicleRegistration by ID
+GET {{Project.WebAPI_HostAddress}}/VehicleRegistrations/1
+Accept: application/json
+
+### POST create a new VehicleRegistration
+POST {{Project.WebAPI_HostAddress}}/VehicleRegistrations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "registrationNumber": "NEW-123",
+  "vehicleModelId": 1,
+  "vehicleEngineTypeId": 2,
+  "vehicleOwnerId": 3
+}
+
+### PUT update an existing VehicleRegistration
+PUT {{Project.WebAPI_HostAddress}}/VehicleRegistrations/3
+Content-Type: application/json
+Accept: application/json
+
+{
+  "registrationNumber": "NEW-456",
+  "vehicleModelId": 2,
+  "vehicleEngineTypeId": 1,
+  "vehicleOwnerId": 1
+}
+
+### DELETE a VehicleRegistration
+DELETE {{Project.WebAPI_HostAddress}}/VehicleRegistrations/1
+Accept: application/json
+
+  ### GET all VehicleEngineTypes
+GET {{Project.WebAPI_HostAddress}}/VehicleEngineTypes
+Accept: application/json
+
+### GET a single VehicleEngineType by ID
+GET {{Project.WebAPI_HostAddress}}/VehicleEngineTypes/1
+Accept: application/json
