@@ -15,7 +15,7 @@ namespace Project.DAL.Entities
         [Required, MaxLength(100)]
         public string LastName { get; set; }
         public DateTime DOB { get; set; }
-        ICollection<VehicleRegistration> VehicleRegistrations { get; set; } = new List<VehicleRegistration>();
+        public ICollection<VehicleRegistration> VehicleRegistrations { get; set; } = new List<VehicleRegistration>();
 
     }
 }
