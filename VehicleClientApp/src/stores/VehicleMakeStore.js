@@ -10,34 +10,41 @@ class VehicleMakeStore {
   sortBy = '';
   sortDescending = false;
   loading = false;
+  error = null;
 
   constructor() {
     makeAutoObservable(this);
   }
 
+  get totalPages() {
+    return Math.ceil(this.totalCount / this.pageSize);
+  }
+
   async fetchMakes() {
     this.loading = true;
+    this.error = null;
     try {
       const params = {
         pageNumber: this.pageNumber,
-        pageSize:   this.pageSize
+        pageSize: this.pageSize,
+        filter: this.filter || undefined,
+        sortBy: this.sortBy || undefined,
+        sortDescending: this.sortDescending || undefined,
       };
-  
-      if (this.filter) {
-        params.filter = this.filter;
-      }
-      if (this.sortBy) {
-        params.sortBy       = this.sortBy;
-        params.sortDescending = this.sortDescending;
-      }
-  
       const { data } = await api.get('/VehicleMakes', { params });
       runInAction(() => {
-        this.makes      = data.items;
+        this.makes = data.items;
         this.totalCount = data.totalCount;
       });
+    } catch (err) {
+      runInAction(() => {
+        this.error = err;
+      });
+      console.error('Error loading makes', err);
     } finally {
-      runInAction(() => { this.loading = false; });
+      runInAction(() => {
+        this.loading = false;
+      });
     }
   }
 
@@ -55,7 +62,8 @@ class VehicleMakeStore {
   setFilter(text) {
     this.filter = text;
     this.pageNumber = 1;
-    this.fetchMakes();
+    if (this._filterDebounce) clearTimeout(this._filterDebounce);
+    this._filterDebounce = setTimeout(() => this.fetchMakes(), 300);
   }
 
   setSort(field) {
@@ -68,26 +76,23 @@ class VehicleMakeStore {
     this.fetchMakes();
   }
 
-  async createMake(makeDto) {
-    const { data } = await api.post('/VehicleMakes', makeDto);
+  async createMake(dto) {
+    const { data } = await api.post('/VehicleMakes', dto);
     runInAction(() => {
       this.pageNumber = 1;
-      this.fetchMakes();
     });
+    this.fetchMakes();
     return data;
   }
 
-  async updateMake(id, makeDto) {
-    await api.put(`/VehicleMakes/${id}`, makeDto);
-    // refresh current page
-    runInAction(() => {
-      this.fetchMakes();
-    });
+  async updateMake(id, dto) {
+    await api.put(`/VehicleMakes/${id}`, dto);
+    this.fetchMakes();
   }
 
   async deleteMake(id) {
     await api.delete(`/VehicleMakes/${id}`);
-    runInAction(() => this.fetchMakes());
+    this.fetchMakes();
   }
 }
 
