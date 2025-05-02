@@ -28,7 +28,11 @@ namespace Project.Service
                 IEnumerable<VehicleMake> filtered = await _repository.Get(
                     filter: string.IsNullOrWhiteSpace(parameters.Filter)
                         ? null
-                        : (Expression<Func<VehicleMake, bool>>)(vm => vm.Name.ToLower().Contains(parameters.Filter.Trim().ToLower())));
+                        : (Expression<Func<VehicleMake, bool>>)(vm => vm.Name.ToLower().Contains(parameters.Filter.Trim().ToLower())),
+                    orderBy: null,
+                    includeProperties: string.Empty,
+                    pagingParameters: null
+                );
 
                 var totalCount = filtered.Count();
 
