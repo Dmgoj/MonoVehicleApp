@@ -35,14 +35,14 @@ export const VehicleOwnerList = observer(() => {
     { key: 'firstName', label: 'First Name' },
     { key: 'lastName', label: 'Last Name' },
     { key: 'dob', label: 'Date of Birth' },
-    { key: 'vehicleMakeName', label: 'Make' },
-    { key: 'vehicleModelName', label: 'Model' },
+    { key: 'makeList', label: 'Make' },
+    { key: 'modelList', label: 'Model' },
   ];
 
   const rows = owners.map(o => ({
     ...o,
-    vehicleMakeName: makeStore.makes.find(m => m.id === o.vehicleMakeId)?.name ?? '—',
-    vehicleModelName: modelStore.models.find(m => m.id === o.vehicleModelId)?.name ?? '—',
+    makeList: o.cars.length ? o.cars.map(c => c.make).join(', ') : '—',
+    modelList: o.cars.length ? o.cars.map(c => c.model).join(', ') : '—',
   }));
 
   return (
