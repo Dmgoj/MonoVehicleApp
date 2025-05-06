@@ -1,3 +1,4 @@
+// src/stores/VehicleOwnerStore.ts
 import { makeAutoObservable, runInAction } from 'mobx';
 import api from '../common/services/api';
 
@@ -14,6 +15,13 @@ class VehicleOwnerStore {
   sortDescending = false;
   loading = false;
   error = null;
+
+  currentOwner = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    dob: '',
+  };
 
   constructor() {
     makeAutoObservable(this);
@@ -39,7 +47,6 @@ class VehicleOwnerStore {
         params.sortBy = this.sortBy;
         params.sortDescending = this.sortDescending;
       }
-
       const { data } = await api.get('/VehicleOwners', { params });
       runInAction(() => {
         this.owners = data.items;
@@ -49,7 +56,6 @@ class VehicleOwnerStore {
       runInAction(() => {
         this.error = err;
       });
-      console.error('Error loading owners', err);
     } finally {
       runInAction(() => {
         this.loading = false;
@@ -111,22 +117,61 @@ class VehicleOwnerStore {
     return data;
   }
 
-  async updateOwner(id, dto) {
+  async updateOwnerById(id, dto) {
     await api.put(`/VehicleOwners/${id}`, dto);
     this.fetchOwners();
   }
 
   async deleteOwner(id) {
     await api.delete(`/VehicleOwners/${id}`);
-
     const newTotal = this.totalCount - 1;
     const newPages = Math.max(Math.ceil(newTotal / this.pageSize), 1);
-
     if (this.pageNumber > newPages) {
       this.pageNumber = newPages;
     }
+    this.fetchOwners();
+  }
 
-    await this.fetchOwners();
+  async loadOwnerForEdit(id) {
+    this.loading = true;
+    try {
+      const { data } = await api.get(`/VehicleOwners/${id}`);
+      runInAction(() => {
+        this.currentOwner = {
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          dob: data.dob.slice(0, 10),
+        };
+        this.loading = false;
+      });
+    } catch {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  }
+
+  setEditFirstName(v) {
+    this.currentOwner.firstName = v;
+  }
+
+  setEditLastName(v) {
+    this.currentOwner.lastName = v;
+  }
+
+  setEditDob(v) {
+    this.currentOwner.dob = v;
+  }
+
+  async saveEdit() {
+    const dto = {
+      firstName: this.currentOwner.firstName,
+      lastName: this.currentOwner.lastName,
+      dob: new Date(this.currentOwner.dob),
+    };
+    await api.put(`/VehicleOwners/${this.currentOwner.id}`, dto);
+    this.fetchOwners();
   }
 }
 
