@@ -1,67 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 import { useNavigate, useParams } from 'react-router-dom';
 import FormField from '../components/FormField';
 import vehicleModelStore from '../stores/VehicleModelStore';
 import vehicleMakeStore from '../stores/VehicleMakeStore';
+import { ROUTES } from '../routes';
 
-export const VehicleModelEdit = () => {
+export const VehicleModelEdit = observer(() => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [abrv, setAbrv] = useState('');
-  const [makeId, setMakeId] = useState('');
-  const [saving, setSaving] = useState(false);
+  const numId = Number(id);
 
   useEffect(() => {
     vehicleMakeStore.fetchMakes();
+    vehicleModelStore.loadModelForEdit(numId);
+  }, [numId]);
 
-    fetch(`/api/VehicleModels/${id}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(dto => {
-        setName(dto.name);
-        setAbrv(dto.abrv);
-        setMakeId(dto.vehicleMakeId.toString());
-      })
-      .catch(() => {
-        alert('Failed to load vehicle model.');
-        navigate('/models');
-      });
-  }, [id, navigate]);
+  const { currentModel, loading } = vehicleModelStore;
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setSaving(true);
-    try {
-      await vehicleModelStore.updateModel(id, {
-        name: name.trim(),
-        abrv: abrv.trim(),
-        vehicleMakeId: Number(makeId),
-      });
-      navigate('/models');
-    } catch (err) {
-      alert('Save failed.');
-    } finally {
-      setSaving(false);
-    }
+    await vehicleModelStore.saveEdit();
+    navigate(ROUTES.MODELS);
   };
+
+  if (loading) return <p>Loading…</p>;
 
   return (
     <div>
       <h2>Edit Vehicle Model</h2>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+      <form onSubmit={handleSubmit}>
         <FormField label="Name">
-          <input value={name} onChange={e => setName(e.target.value)} required />
+          <input value={currentModel.name} onChange={e => vehicleModelStore.setEditName(e.target.value)} required />
         </FormField>
-
         <FormField label="Abbreviation">
-          <input value={abrv} onChange={e => setAbrv(e.target.value)} />
+          <input value={currentModel.abrv} onChange={e => vehicleModelStore.setEditAbrv(e.target.value)} />
         </FormField>
-
         <FormField label="Make">
-          <select value={makeId} onChange={e => setMakeId(e.target.value)} required>
+          <select
+            value={currentModel.vehicleMakeId}
+            onChange={e => vehicleModelStore.setEditMakeId(e.target.value)}
+            required
+          >
             <option value="">— select make —</option>
             {vehicleMakeStore.makes.map(m => (
               <option key={m.id} value={m.id}>
@@ -70,14 +50,11 @@ export const VehicleModelEdit = () => {
             ))}
           </select>
         </FormField>
-
-        <button type="submit" disabled={saving}>
-          {saving ? 'Saving…' : 'Update'}
-        </button>
-        <button type="button" onClick={() => navigate('/models')} style={{ marginLeft: '0.5rem' }}>
+        <button type="submit">Update</button>
+        <button type="button" onClick={() => navigate(ROUTES.MODELS)}>
           Cancel
         </button>
       </form>
     </div>
   );
-};
+});
