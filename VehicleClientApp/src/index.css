@@ -66,3 +66,9 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+table td {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 200px;
+}
