@@ -1,4 +1,3 @@
-// src/pages/VehicleModelList.jsx
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,7 +11,6 @@ export const VehicleModelList = observer(() => {
   const makeStore = vehicleMakeStore;
   const navigate = useNavigate();
 
-  // on mount: load makes (for dropdown) then models (with any makeFilter)
   useEffect(() => {
     (async () => {
       await makeStore.fetchMakes();
@@ -31,7 +29,7 @@ export const VehicleModelList = observer(() => {
     if (!window.confirm(`Delete "${label}"?`)) return;
 
     await modelStore.deleteModel(id);
-    // if last item on page removed, go back a page
+
     if (modelStore.models.length === 0 && modelStore.pageNumber > 1) {
       modelStore.setPage(modelStore.pageNumber - 1);
     }
@@ -48,7 +46,6 @@ export const VehicleModelList = observer(() => {
       <h2>Vehicle Models</h2>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-        {/* page size */}
         <label>
           Results per page:
           <select
