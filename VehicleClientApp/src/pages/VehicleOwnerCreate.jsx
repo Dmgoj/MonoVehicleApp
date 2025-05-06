@@ -1,32 +1,27 @@
-// src/pages/VehicleOwnerCreate.jsx
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 import { useNavigate } from 'react-router-dom';
 import FormField from '../components/FormField';
 import ownerStore from '../stores/VehicleOwnerStore';
 import { ROUTES } from '../routes';
 
-export const VehicleOwnerCreate = () => {
+export const VehicleOwnerCreate = observer(() => {
   const navigate = useNavigate();
-  const [firstName, setFirst] = useState('');
-  const [lastName, setLast] = useState('');
-  const [dob, setDob] = useState('');
-  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    ownerStore.currentOwner = { id: 0, firstName: '', lastName: '', dob: '' };
+  }, []);
+
+  const { currentOwner } = ownerStore;
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setSaving(true);
-    try {
-      await ownerStore.createOwner({
-        firstName,
-        lastName,
-        dob: new Date(dob),
-      });
-      navigate(ROUTES.OWNERS);
-    } catch {
-      alert('Save failed');
-    } finally {
-      setSaving(false);
-    }
+    await ownerStore.createOwner({
+      firstName: currentOwner.firstName,
+      lastName: currentOwner.lastName,
+      dob: new Date(currentOwner.dob),
+    });
+    navigate(ROUTES.OWNERS);
   };
 
   return (
@@ -34,24 +29,19 @@ export const VehicleOwnerCreate = () => {
       <h2>Create Vehicle Owner</h2>
       <form onSubmit={handleSubmit}>
         <FormField label="First Name">
-          <input value={firstName} onChange={e => setFirst(e.target.value)} required />
+          <input value={currentOwner.firstName} onChange={e => ownerStore.setEditFirstName(e.target.value)} required />
         </FormField>
-
         <FormField label="Last Name">
-          <input value={lastName} onChange={e => setLast(e.target.value)} required />
+          <input value={currentOwner.lastName} onChange={e => ownerStore.setEditLastName(e.target.value)} required />
         </FormField>
-
         <FormField label="Date of Birth">
-          <input type="date" value={dob} onChange={e => setDob(e.target.value)} required />
+          <input type="date" value={currentOwner.dob} onChange={e => ownerStore.setEditDob(e.target.value)} required />
         </FormField>
-
-        <button type="submit" disabled={saving}>
-          {saving ? 'Saving…' : 'Create'}
-        </button>
-        <button type="button" onClick={() => navigate(ROUTES.OWNERS)} style={{ marginLeft: '0.5rem' }}>
+        <button type="submit">Create</button>
+        <button type="button" onClick={() => navigate(ROUTES.OWNERS)}>
           Cancel
         </button>
       </form>
     </div>
   );
-};
+});
