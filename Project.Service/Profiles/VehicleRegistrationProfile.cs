@@ -12,13 +12,10 @@ namespace Project.Service.Profiles
     {
         public VehicleRegistrationProfile()
         {
-            CreateMap<VehicleRegistration, VehicleRegistrationDto>()
-                 .ForMember(dest => dest.ModelName,
-                           opt => opt.MapFrom(src => src.VehicleModel.Name))
-                .ForMember(dest => dest.EngineType,
-                           opt => opt.MapFrom(src => src.VehicleEngineType.Type))
-                .ForMember(dest => dest.OwnerFullName,
-                           opt => opt.MapFrom(src => $"{src.VehicleOwner.FirstName} {src.VehicleOwner.LastName}"));
+            CreateMap<VehicleRegistration, CarDto>()
+                .ForMember(d => d.Make, o => o.MapFrom(r => r.VehicleModel.VehicleMake.Name))
+                .ForMember(d => d.Model, o => o.MapFrom(r => r.VehicleModel.Name))
+                .ForMember(d => d.RegistrationNumber, o => o.MapFrom(r => r.RegistrationNumber));
             CreateMap<VehicleRegistrationForCreateDto, VehicleRegistration>();
             CreateMap<VehicleRegistrationForUpdateDto, VehicleRegistration>();
         }
