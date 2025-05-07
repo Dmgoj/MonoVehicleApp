@@ -33,26 +33,21 @@ namespace Project.Service
         {
             try
             {
-                string term = string.IsNullOrWhiteSpace(parameters.Filter)
+                string firstNameTerm = string.IsNullOrWhiteSpace(parameters.FirstName)
                     ? null
-                    : parameters.Filter.Trim().ToLower();
+                    : parameters.FirstName.Trim().ToLower();
+
+                string lastNameTerm = string.IsNullOrWhiteSpace(parameters.LastName)
+                    ? null
+                    : parameters.LastName.Trim().ToLower();
 
                 Expression<Func<VehicleOwner, bool>> filter = o =>
-                    (term == null
-                     || o.FirstName.ToLower().Contains(term)
-                     || o.LastName.ToLower().Contains(term))
-                    && (!parameters.MakeId.HasValue
-                        || o.VehicleRegistrations
-                            .Any(r => r.VehicleModel.VehicleMakeId == parameters.MakeId.Value))
-                    && (!parameters.ModelId.HasValue
-                        || o.VehicleRegistrations
-                            .Any(r => r.VehicleModelId == parameters.ModelId.Value));
+                    (firstNameTerm == null || o.FirstName.ToLower().Contains(firstNameTerm))
+                    && (lastNameTerm == null || o.LastName.ToLower().Contains(lastNameTerm))
+                    && (!parameters.MakeId.HasValue || o.VehicleRegistrations.Any(r => r.VehicleModel.VehicleMakeId == parameters.MakeId.Value))
+                    && (!parameters.ModelId.HasValue || o.VehicleRegistrations.Any(r => r.VehicleModelId == parameters.ModelId.Value));
 
-                var all = await _repository.Get(
-                    filter: filter,
-                    includeProperties: "VehicleRegistrations.VehicleModel,VehicleRegistrations.VehicleModel.VehicleMake"
-                );
-                var totalCount = all.Count();
+                var totalCount = (await _repository.Get(filter: filter)).Count();
 
                 Func<IQueryable<VehicleOwner>, IOrderedQueryable<VehicleOwner>> orderBy = null;
                 if (!string.IsNullOrWhiteSpace(parameters.SortBy)
@@ -77,7 +72,7 @@ namespace Project.Service
                 var page = await _repository.Get(
                     filter: filter,
                     orderBy: orderBy,
-                    includeProperties: "VehicleRegistrations.VehicleModel,VehicleRegistrations.VehicleModel.VehicleMake",
+                    includeProperties: "VehicleRegistrations,VehicleRegistrations.VehicleModel,VehicleRegistrations.VehicleModel.VehicleMake",
                     pagingParameters: parameters
                 );
 
