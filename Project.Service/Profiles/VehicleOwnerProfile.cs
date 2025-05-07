@@ -12,7 +12,8 @@ namespace Project.Service.Profiles
     {
         public VehicleOwnerProfile()
         {
-            CreateMap<VehicleOwner, VehicleOwnerDto>();
+            CreateMap<VehicleOwner, VehicleOwnerDto>()
+                .ForMember(d => d.Cars, opt => opt.MapFrom(src => src.VehicleRegistrations));
             CreateMap<VehicleOwnerForCreateDto, VehicleOwner>();
             CreateMap<VehicleOwnerForUpdateDto, VehicleOwner>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) =>
