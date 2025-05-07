@@ -37,7 +37,9 @@ export const VehicleMakeList = observer(() => {
   ];
 
   useEffect(() => {
-    store.fetchMakes();
+    if (store.makes.length === 0) {
+      store.fetchMakes();
+    }
   }, []);
 
   return (
@@ -77,8 +79,8 @@ export const VehicleMakeList = observer(() => {
         <>
           <Table
             columns={columns}
-            data={store.makes}
-            onSort={store.setSort.bind(store)}
+            data={store.sortedMakes}
+            onSort={store.setClientSort.bind(store)}
             sortBy={store.sortBy}
             sortDesc={store.sortDescending}
             onRowDelete={handleDelete}
