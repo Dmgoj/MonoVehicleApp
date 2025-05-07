@@ -1,3 +1,4 @@
+// src/pages/VehicleOwnerList.jsx
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,21 +13,32 @@ export const VehicleOwnerList = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      await makeStore.fetchMakes();
-      await modelStore.fetchModels();
-      await ownerStore.fetchOwners();
-    })();
+    if (makeStore.makes.length === 0) makeStore.fetchMakes();
+    if (modelStore.models.length === 0) modelStore.fetchModels();
+    if (ownerStore.owners.length === 0) ownerStore.fetchOwners();
   }, []);
 
-  const { owners, totalCount, pageNumber, pageSize, sortBy, sortDescending, loading, totalPages } = ownerStore;
+  const {
+    makeFilter,
+    modelFilter,
+    firstNameFilter,
+    lastNameFilter,
+    sortedOwners,
+    totalCount,
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDescending,
+    loading,
+    totalPages,
+  } = ownerStore;
+
   const hasPrev = pageNumber > 1;
   const hasNext = pageNumber < totalPages;
 
   const handleEdit = id => navigate(`edit/${id}`);
-
   const handleDelete = async id => {
-    const o = owners.find(x => x.id === id);
+    const o = sortedOwners.find(x => x.id === id);
     if (!window.confirm(`Delete "${o.firstName} ${o.lastName}"?`)) return;
     await ownerStore.deleteOwner(id);
   };
@@ -39,7 +51,7 @@ export const VehicleOwnerList = observer(() => {
     { key: 'modelList', label: 'Model' },
   ];
 
-  const rows = owners.map(o => ({
+  const rows = sortedOwners.map(o => ({
     ...o,
     makeList: o.cars.length ? o.cars.map(c => c.make).join(', ') : '—',
     modelList: o.cars.length ? o.cars.map(c => c.model).join(', ') : '—',
@@ -50,7 +62,7 @@ export const VehicleOwnerList = observer(() => {
       <h2>Vehicle Owners</h2>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
         <FormField label="Make">
-          <select value={ownerStore.makeFilter} onChange={e => ownerStore.setMakeFilter(e.target.value)}>
+          <select value={makeFilter} onChange={e => ownerStore.setMakeFilter(e.target.value)}>
             <option value="">All</option>
             {makeStore.makes.map(m => (
               <option key={m.id} value={m.id}>
@@ -60,7 +72,7 @@ export const VehicleOwnerList = observer(() => {
           </select>
         </FormField>
         <FormField label="Model">
-          <select value={ownerStore.modelFilter} onChange={e => ownerStore.setModelFilter(e.target.value)}>
+          <select value={modelFilter} onChange={e => ownerStore.setModelFilter(e.target.value)}>
             <option value="">All</option>
             {modelStore.models.map(m => (
               <option key={m.id} value={m.id}>
@@ -70,10 +82,10 @@ export const VehicleOwnerList = observer(() => {
           </select>
         </FormField>
         <FormField label="First Name">
-          <input value={ownerStore.firstNameFilter} onChange={e => ownerStore.setFirstNameFilter(e.target.value)} />
+          <input value={firstNameFilter} onChange={e => ownerStore.setFirstNameFilter(e.target.value)} />
         </FormField>
         <FormField label="Last Name">
-          <input value={ownerStore.lastNameFilter} onChange={e => ownerStore.setLastNameFilter(e.target.value)} />
+          <input value={lastNameFilter} onChange={e => ownerStore.setLastNameFilter(e.target.value)} />
         </FormField>
         <FormField label="Per page">
           <select value={pageSize} onChange={e => ownerStore.setPageSize(Number(e.target.value))}>
@@ -86,6 +98,7 @@ export const VehicleOwnerList = observer(() => {
         </FormField>
         <Link to={ROUTES.OWNER_CREATE}>Create</Link>
       </div>
+
       {loading ? (
         <p>Loading…</p>
       ) : totalCount === 0 ? (
