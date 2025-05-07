@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, autorun } from 'mobx';
 import api from '../common/services/api';
 
 class VehicleModelStore {
@@ -22,6 +22,35 @@ class VehicleModelStore {
 
   constructor() {
     makeAutoObservable(this);
+
+    const saved = localStorage.getItem('vehicleModelStore');
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.models = data.models || [];
+      this.totalCount = data.totalCount || 0;
+      this.pageNumber = data.pageNumber || 1;
+      this.pageSize = data.pageSize || 10;
+      this.filter = data.filter || '';
+      this.makeFilter = data.makeFilter || '';
+      this.sortBy = data.sortBy || '';
+      this.sortDescending = data.sortDescending || false;
+    }
+
+    autorun(() => {
+      localStorage.setItem(
+        'vehicleModelStore',
+        JSON.stringify({
+          models: this.models,
+          totalCount: this.totalCount,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+          filter: this.filter,
+          makeFilter: this.makeFilter,
+          sortBy: this.sortBy,
+          sortDescending: this.sortDescending,
+        }),
+      );
+    });
   }
 
   get totalPages() {
@@ -38,10 +67,9 @@ class VehicleModelStore {
       };
       if (this.filter) params.filter = this.filter;
       if (this.makeFilter) params.makeId = this.makeFilter;
-      if (this.sortBy) {
-        params.sortBy = this.sortBy;
-        params.sortDescending = this.sortDescending;
-      }
+      if (this.sortBy) params.sortBy = this.sortBy;
+      if (this.sortBy) params.sortDescending = this.sortDescending;
+
       const { data } = await api.get('/VehicleModels', { params });
       runInAction(() => {
         this.models = data.items;
@@ -56,34 +84,36 @@ class VehicleModelStore {
 
   setPage(page) {
     this.pageNumber = page;
+    this.models = [];
     this.fetchModels();
   }
 
   setPageSize(size) {
     this.pageSize = size;
     this.pageNumber = 1;
+    this.models = [];
     this.fetchModels();
   }
 
   setFilter(text) {
     this.filter = text;
     this.pageNumber = 1;
+    this.models = [];
     this.fetchModels();
   }
 
   setMakeFilter(makeId) {
     this.makeFilter = makeId;
     this.pageNumber = 1;
+    this.models = [];
     this.fetchModels();
   }
 
   setSort(field) {
-    if (this.sortBy === field) {
-      this.sortDescending = !this.sortDescending;
-    } else {
-      this.sortBy = field;
-      this.sortDescending = false;
-    }
+    this.sortBy = field === this.sortBy ? this.sortBy : field;
+    this.sortDescending = field === this.sortBy ? !this.sortDescending : false;
+
+    this.models = [];
     this.fetchModels();
   }
 
@@ -108,7 +138,6 @@ class VehicleModelStore {
       runInAction(() => {
         this.pageNumber = Math.max(this.totalPages, 1);
       });
-
       await this.fetchModels();
     }
   }
