@@ -1,4 +1,4 @@
-// src/stores/VehicleOwnerStore.ts
+// src/stores/VehicleOwnerStore.js
 import { makeAutoObservable, runInAction } from 'mobx';
 import api from '../common/services/api';
 
@@ -16,12 +16,7 @@ class VehicleOwnerStore {
   loading = false;
   error = null;
 
-  currentOwner = {
-    id: 0,
-    firstName: '',
-    lastName: '',
-    dob: '',
-  };
+  currentOwner = { id: 0, firstName: '', lastName: '', dob: '' };
 
   constructor() {
     makeAutoObservable(this);
@@ -29,6 +24,39 @@ class VehicleOwnerStore {
 
   get totalPages() {
     return Math.ceil(this.totalCount / this.pageSize);
+  }
+
+  get sortedOwners() {
+    const list = [...this.owners];
+    if (!this.sortBy) return list;
+
+    function getFieldVal(o, field) {
+      if (field === 'makeList') {
+        return (o.cars.length ? o.cars.map(c => c.make).join(', ') : '').toLowerCase();
+      }
+      if (field === 'modelList') {
+        return (o.cars.length ? o.cars.map(c => c.model).join(', ') : '').toLowerCase();
+      }
+      return String(o[field] || '').toLowerCase();
+    }
+
+    list.sort((a, b) => {
+      const aVal = getFieldVal(a, this.sortBy);
+      const bVal = getFieldVal(b, this.sortBy);
+      if (aVal < bVal) return this.sortDescending ? 1 : -1;
+      if (aVal > bVal) return this.sortDescending ? -1 : 1;
+      return 0;
+    });
+    return list;
+  }
+
+  setClientSort(field) {
+    if (this.sortBy === field) {
+      this.sortDescending = !this.sortDescending;
+    } else {
+      this.sortBy = field;
+      this.sortDescending = false;
+    }
   }
 
   async fetchOwners() {
@@ -43,10 +71,7 @@ class VehicleOwnerStore {
       if (this.modelFilter) params.modelId = this.modelFilter;
       if (this.firstNameFilter) params.firstName = this.firstNameFilter;
       if (this.lastNameFilter) params.lastName = this.lastNameFilter;
-      if (this.sortBy) {
-        params.sortBy = this.sortBy;
-        params.sortDescending = this.sortDescending;
-      }
+
       const { data } = await api.get('/VehicleOwners', { params });
       runInAction(() => {
         this.owners = data.items;
@@ -98,6 +123,7 @@ class VehicleOwnerStore {
     this.fetchOwners();
   }
 
+  // **only** flip in‑memory sort, no API call
   setSort(field) {
     if (this.sortBy === field) {
       this.sortDescending = !this.sortDescending;
@@ -105,7 +131,6 @@ class VehicleOwnerStore {
       this.sortBy = field;
       this.sortDescending = false;
     }
-    this.fetchOwners();
   }
 
   async createOwner(dto) {
@@ -126,9 +151,7 @@ class VehicleOwnerStore {
     await api.delete(`/VehicleOwners/${id}`);
     const newTotal = this.totalCount - 1;
     const newPages = Math.max(Math.ceil(newTotal / this.pageSize), 1);
-    if (this.pageNumber > newPages) {
-      this.pageNumber = newPages;
-    }
+    if (this.pageNumber > newPages) this.pageNumber = newPages;
     this.fetchOwners();
   }
 
@@ -143,23 +166,19 @@ class VehicleOwnerStore {
           lastName: data.lastName,
           dob: data.dob.slice(0, 10),
         };
-        this.loading = false;
       });
-    } catch {
-      runInAction(() => {
-        this.loading = false;
-      });
-    }
+    } catch {}
+    runInAction(() => {
+      this.loading = false;
+    });
   }
 
   setEditFirstName(v) {
     this.currentOwner.firstName = v;
   }
-
   setEditLastName(v) {
     this.currentOwner.lastName = v;
   }
-
   setEditDob(v) {
     this.currentOwner.dob = v;
   }
