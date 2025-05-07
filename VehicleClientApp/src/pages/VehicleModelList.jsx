@@ -29,7 +29,6 @@ export const VehicleModelList = observer(() => {
     const rec = modelStore.models.find(m => m.id === id);
     const label = rec ? rec.name : 'this model';
     if (!window.confirm(`Delete "${label}"?`)) return;
-
     await modelStore.deleteModel(id);
     if (modelStore.models.length === 0 && modelStore.pageNumber > 1) {
       modelStore.setPage(modelStore.pageNumber - 1);
@@ -45,7 +44,6 @@ export const VehicleModelList = observer(() => {
   return (
     <div>
       <h2>Vehicle Models</h2>
-
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
         <label>
           Results per page:
@@ -64,7 +62,6 @@ export const VehicleModelList = observer(() => {
             ))}
           </select>
         </label>
-
         <label>
           Filter by make:
           <select
@@ -83,10 +80,8 @@ export const VehicleModelList = observer(() => {
             ))}
           </select>
         </label>
-
         <Link to={ROUTES.MODEL_CREATE}>Create</Link>
       </div>
-
       {modelStore.loading ? (
         <p>Loading…</p>
       ) : modelStore.totalCount === 0 ? (
@@ -95,7 +90,7 @@ export const VehicleModelList = observer(() => {
         <>
           <Table
             columns={columns}
-            data={modelStore.models.map(m => ({
+            data={modelStore.sortedModels.map(m => ({
               ...m,
               vehicleMakeName: makeStore.makes.find(x => x.id === m.vehicleMakeId)?.name ?? '—',
             }))}
@@ -105,7 +100,6 @@ export const VehicleModelList = observer(() => {
             onRowEdit={handleEdit}
             onRowDelete={handleDelete}
           />
-
           <div style={{ marginTop: '1rem' }}>
             <button disabled={!hasPrev} onClick={() => modelStore.setPage(modelStore.pageNumber - 1)}>
               Prev
