@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, autorun } from 'mobx';
 import api from '../common/services/api';
 
 class VehicleMakeStore {
@@ -14,10 +14,50 @@ class VehicleMakeStore {
 
   constructor() {
     makeAutoObservable(this);
+
+    const saved = localStorage.getItem('vehicleMakeStore');
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.makes = data.makes || [];
+      this.totalCount = data.totalCount || 0;
+      this.pageNumber = data.pageNumber || 1;
+      this.pageSize = data.pageSize || 10;
+      this.filter = data.filter || '';
+      this.sortBy = data.sortBy || '';
+      this.sortDescending = data.sortDescending || false;
+    }
+
+    autorun(() => {
+      localStorage.setItem(
+        'vehicleMakeStore',
+        JSON.stringify({
+          makes: this.makes,
+          totalCount: this.totalCount,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+          filter: this.filter,
+          sortBy: this.sortBy,
+          sortDescending: this.sortDescending,
+        }),
+      );
+    });
   }
 
   get totalPages() {
     return Math.ceil(this.totalCount / this.pageSize);
+  }
+
+  get sortedMakes() {
+    const list = [...this.makes];
+    if (!this.sortBy) return list;
+    list.sort((a, b) => {
+      const aVal = String(a[this.sortBy]).toLowerCase();
+      const bVal = String(b[this.sortBy]).toLowerCase();
+      if (aVal < bVal) return this.sortDescending ? 1 : -1;
+      if (aVal > bVal) return this.sortDescending ? -1 : 1;
+      return 0;
+    });
+    return list;
   }
 
   async fetchMakes() {
@@ -74,6 +114,15 @@ class VehicleMakeStore {
       this.sortDescending = false;
     }
     this.fetchMakes();
+  }
+
+  setClientSort(field) {
+    if (this.sortBy === field) {
+      this.sortDescending = !this.sortDescending;
+    } else {
+      this.sortBy = field;
+      this.sortDescending = false;
+    }
   }
 
   async createMake(dto) {
