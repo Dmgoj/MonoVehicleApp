@@ -24,7 +24,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-builder.Services.AddAutoMapper(typeof(VehicleMakeService).Assembly);
+//builder.Services.AddAutoMapper(typeof(VehicleMakeService).Assembly);
+// scan *all* your service assemblies for profiles
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IVehicleMakeRepository, VehicleMakeRepository>();
 builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
