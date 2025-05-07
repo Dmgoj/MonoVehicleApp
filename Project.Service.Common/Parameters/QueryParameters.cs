@@ -47,5 +47,8 @@ namespace Project.Service.Common.Parameters
         public bool SortDescending { get; set; }
         public int? MakeId { get; set; }
         public int? ModelId { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+
     }
 }
