@@ -12,10 +12,12 @@ export const VehicleModelList = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      await makeStore.fetchMakes();
-      await modelStore.fetchModels();
-    })();
+    if (makeStore.makes.length === 0) {
+      makeStore.fetchMakes();
+    }
+    if (modelStore.models.length === 0) {
+      modelStore.fetchModels();
+    }
   }, []);
 
   const totalPages = modelStore.totalPages;
@@ -29,7 +31,6 @@ export const VehicleModelList = observer(() => {
     if (!window.confirm(`Delete "${label}"?`)) return;
 
     await modelStore.deleteModel(id);
-
     if (modelStore.models.length === 0 && modelStore.pageNumber > 1) {
       modelStore.setPage(modelStore.pageNumber - 1);
     }
