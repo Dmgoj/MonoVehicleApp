@@ -1,5 +1,6 @@
-import { makeAutoObservable, runInAction, autorun } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import api from '../common/services/api';
+import vehicleMakeStore from './VehicleMakeStore';
 
 class VehicleModelStore {
   models = [];
@@ -13,16 +14,10 @@ class VehicleModelStore {
   loading = false;
   error = null;
 
-  currentModel = {
-    id: 0,
-    name: '',
-    abrv: '',
-    vehicleMakeId: '',
-  };
+  currentModel = { id: 0, name: '', abrv: '', vehicleMakeId: '' };
 
   constructor() {
     makeAutoObservable(this);
-
     const saved = localStorage.getItem('vehicleModelStore');
     if (saved) {
       const data = JSON.parse(saved);
@@ -35,45 +30,51 @@ class VehicleModelStore {
       this.sortBy = data.sortBy || '';
       this.sortDescending = data.sortDescending || false;
     }
-
-    autorun(() => {
-      localStorage.setItem(
-        'vehicleModelStore',
-        JSON.stringify({
-          models: this.models,
-          totalCount: this.totalCount,
-          pageNumber: this.pageNumber,
-          pageSize: this.pageSize,
-          filter: this.filter,
-          makeFilter: this.makeFilter,
-          sortBy: this.sortBy,
-          sortDescending: this.sortDescending,
-        }),
-      );
-    });
   }
 
   get totalPages() {
     return Math.ceil(this.totalCount / this.pageSize);
   }
 
+  get sortedModels() {
+    const list = [...this.models];
+    if (!this.sortBy) return list;
+    if (this.sortBy === 'vehicleMakeName') {
+      // ← special case
+      list.sort((a, b) => {
+        const aName = vehicleMakeStore.makes.find(m => m.id === a.vehicleMakeId)?.name?.toLowerCase() || '';
+        const bName = vehicleMakeStore.makes.find(m => m.id === b.vehicleMakeId)?.name?.toLowerCase() || '';
+        if (aName < bName) return this.sortDescending ? 1 : -1;
+        if (aName > bName) return this.sortDescending ? -1 : 1;
+        return 0;
+      });
+      return list;
+    }
+    list.sort((a, b) => {
+      const aVal = String(a[this.sortBy]).toLowerCase();
+      const bVal = String(b[this.sortBy]).toLowerCase();
+      if (aVal < bVal) return this.sortDescending ? 1 : -1;
+      if (aVal > bVal) return this.sortDescending ? -1 : 1;
+      return 0;
+    });
+    return list;
+  }
+
   async fetchModels() {
     this.loading = true;
     this.error = null;
     try {
-      const params = {
-        pageNumber: this.pageNumber,
-        pageSize: this.pageSize,
-      };
+      const params = { pageNumber: this.pageNumber, pageSize: this.pageSize };
       if (this.filter) params.filter = this.filter;
       if (this.makeFilter) params.makeId = this.makeFilter;
-      if (this.sortBy) params.sortBy = this.sortBy;
-      if (this.sortBy) params.sortDescending = this.sortDescending;
-
       const { data } = await api.get('/VehicleModels', { params });
       runInAction(() => {
         this.models = data.items;
         this.totalCount = data.totalCount;
+      });
+    } catch (err) {
+      runInAction(() => {
+        this.error = err;
       });
     } finally {
       runInAction(() => {
@@ -84,37 +85,34 @@ class VehicleModelStore {
 
   setPage(page) {
     this.pageNumber = page;
-    this.models = [];
     this.fetchModels();
   }
 
   setPageSize(size) {
     this.pageSize = size;
     this.pageNumber = 1;
-    this.models = [];
     this.fetchModels();
   }
 
   setFilter(text) {
     this.filter = text;
     this.pageNumber = 1;
-    this.models = [];
     this.fetchModels();
   }
 
-  setMakeFilter(makeId) {
-    this.makeFilter = makeId;
+  setMakeFilter(id) {
+    this.makeFilter = id;
     this.pageNumber = 1;
-    this.models = [];
     this.fetchModels();
   }
 
   setSort(field) {
-    this.sortBy = field === this.sortBy ? this.sortBy : field;
-    this.sortDescending = field === this.sortBy ? !this.sortDescending : false;
-
-    this.models = [];
-    this.fetchModels();
+    if (this.sortBy === field) {
+      this.sortDescending = !this.sortDescending;
+    } else {
+      this.sortBy = field;
+      this.sortDescending = false;
+    }
   }
 
   async createModel(dto) {
@@ -133,12 +131,12 @@ class VehicleModelStore {
 
   async deleteModel(id) {
     await api.delete(`/VehicleModels/${id}`);
-    await this.fetchModels();
+    this.fetchModels();
     if (this.pageNumber > this.totalPages) {
       runInAction(() => {
         this.pageNumber = Math.max(this.totalPages, 1);
       });
-      await this.fetchModels();
+      this.fetchModels();
     }
   }
 
@@ -168,9 +166,11 @@ class VehicleModelStore {
   setEditName(v) {
     this.currentModel.name = v;
   }
+
   setEditAbrv(v) {
     this.currentModel.abrv = v;
   }
+
   setEditMakeId(v) {
     this.currentModel.vehicleMakeId = v;
   }
